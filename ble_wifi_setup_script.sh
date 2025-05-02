@@ -11,8 +11,7 @@ sudo apt update && sudo apt install -y \
   python3-gi \
   bluetooth \
   bluez \
-  network-manager \
-  hcitool
+  network-manager 
 
 sudo systemctl enable NetworkManager
 sudo systemctl restart NetworkManager
