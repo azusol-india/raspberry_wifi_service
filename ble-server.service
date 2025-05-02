@@ -1,0 +1,14 @@
+[Unit]
+Description=Start BLE Advertising and GATT Server (ArrestoAICamera)
+After=bluetooth.target
+
+[Service]
+ExecStart=/home/arresto/start_ble_server.sh
+Restart=on-failure
+User=arresto
+WorkingDirectory=/home/arresto
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
