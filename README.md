@@ -24,40 +24,34 @@ This guide helps you configure a Raspberry Pi to act as a **BLE-configurable WiF
 
 ---
 
-## 🚀 Installation Steps (One-time per Pi)
+## 🚀 One-Line Installation (Recommended for Production)
 
-### 1. Install system dependencies
-
-```bash
-sudo apt update
-sudo apt install -y python3 python3-pip python3-dbus python3-gi bluetooth bluez network-manager
-sudo systemctl enable NetworkManager
-sudo systemctl restart NetworkManager
-```
-
-### 2. Create virtual environment
+From a fresh Raspberry Pi:
 
 ```bash
-python3 -m venv ~/ble-env
-source ~/ble-env/bin/activate
-pip install pydbus
+git clone https://github.com/arresto-ai/ble-wifi-setup.git
+cd ble-wifi-setup
+chmod +x install_ble_wifi.sh
+./install_ble_wifi.sh
 ```
+
+This will:
+- Install all required dependencies
+- Create a Python virtual environment
+- Copy all files to the correct system locations
+- Enable and launch the BLE WiFi provisioning server on boot
 
 ---
 
-## 📁 File Structure (Install these manually or via script)
+## 📁 Folder Structure (in this repo)
 
-| File                        | Target Path                             |
-|-----------------------------|------------------------------------------|
-| `wifi_ble_server_corrected.py` | `/home/arresto/wifi_ble_server_corrected.py` |
-| `start_ble_server.sh`      | `/home/arresto/start_ble_server.sh`     |
-| `ble-server.service`       | `/etc/systemd/system/ble-server.service`|
-
-Make `start_ble_server.sh` executable:
-
-```bash
-chmod +x /home/arresto/start_ble_server.sh
-```
+| File                        | Purpose                                      |
+|-----------------------------|----------------------------------------------|
+| `wifi_ble_server_corrected.py` | Python BLE GATT server                     |
+| `start_ble_server.sh`      | Script to bring up BLE + start GATT server  |
+| `ble-server.service`       | systemd unit to launch on boot              |
+| `install_ble_wifi.sh`      | 🔧 One-click installer script                |
+| `README.md`                | This documentation                          |
 
 ---
 
@@ -68,18 +62,12 @@ chmod +x /home/arresto/start_ble_server.sh
   - `SSID` (read/write): to show and update current WiFi network
   - `Password` (write-only): to securely input WiFi password
 - Connects to the specified WiFi using `nmcli`
-- Does **not** reboot after connect
-- Keeps BLE active even after WiFi is changed
+- Does **not** reboot after connect (but can be enabled in code)
+- Keeps BLE advertising active permanently
 
 ---
 
-## 🟢 Enable Service on Boot
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable ble-server.service
-sudo systemctl start ble-server.service
-```
+## 🟢 Managing the Service
 
 To check status:
 ```bash
@@ -91,12 +79,16 @@ To view logs:
 sudo journalctl -u ble-server.service -f
 ```
 
+To restart the service manually:
+```bash
+sudo systemctl restart ble-server.service
+```
+
 ---
 
 ## 🧪 Testing Setup
 
 ### 1. Use nRF Connect (or your Flutter App) to scan
-
 - Ensure Pi is powered on
 - Scan for device `ArrestoAICamera`
 - Look for advertised services (UUID: `12345678-1234-5678-1234-56789abcdef0`)
@@ -104,26 +96,22 @@ sudo journalctl -u ble-server.service -f
 ### 2. Connect and test read/write
 
 #### ✅ Read SSID:
-- Connect to the Pi over BLE
-- Read characteristic: `12345678-1234-5678-1234-56789abcdef1`
-- Output will show current connected SSID
+- Read `12345678-1234-5678-1234-56789abcdef1`
+- Shows currently connected SSID
 
 #### ✍️ Write new credentials:
-- Write new SSID to characteristic: `12345678-1234-5678-1234-56789abcdef1`
-- Write password to: `12345678-1234-5678-1234-56789abcdef2`
-- BLE script will:
-  - Delete old WiFi configs (only `wifi`, not `ethernet`)
-  - Connect to new network
-  - Log results in system journal
+- Write new SSID → `12345678-1234-5678-1234-56789abcdef1`
+- Write password → `12345678-1234-5678-1234-56789abcdef2`
+- Server will:
+  - Remove all saved WiFi profiles except ethernet
+  - Attempt connection to the new WiFi network
+  - Print connection status to logs
 
-### ✅ Validate Connection:
-
+#### 🔍 Validate WiFi:
 ```bash
 nmcli -t -f active,ssid dev wifi | grep yes:
 ```
-
 or
-
 ```bash
 hostname -I
 ```
@@ -134,22 +122,26 @@ hostname -I
 
 | Problem                          | Solution                                      |
 |----------------------------------|-----------------------------------------------|
-| Device name not visible over BLE | Ensure hcitool command ran in `start_ble_server.sh` |
-| BLE connection drops             | Confirm you wrote both SSID and password      |
-| WiFi doesn't connect             | Check logs: `sudo journalctl -u ble-server.service -n 100` |
-| Service not starting             | Run `sudo systemctl status ble-server.service` |
+| Name not visible in scan         | Ensure HCI name broadcast is working (via `hcitool`) |
+| Multiple BLE records             | Avoid launching multiple services or duplicate scripts |
+| WiFi not connecting              | Check logs: `sudo journalctl -u ble-server.service -n 100` |
+| BLE drops after writing          | Ensure you write SSID *and* password in correct order |
 
 ---
 
-## 🔁 Cloning Setup to Other Raspberry Pis
+## 🔁 Cloning to More Raspberry Pis
 
-1. Copy all three files to the same locations
-2. Run the install/setup steps (dependency install + venv)
-3. Enable and start the service
-4. Done!
+On any new Raspberry Pi:
+```bash
+git clone https://github.com/arresto-ai/ble-wifi-setup.git
+cd ble-wifi-setup
+chmod +x install_ble_wifi.sh
+./install_ble_wifi.sh
+```
+Done! 🎉
 
 ---
 
 ## 👋 Author
 
-Built as part of the **Arresto AI Camera** project for easy wireless provisioning via BLE.
+Built as part of the **Arresto AI Camera** project for easy wireless provisioning via BLE. Contributions welcome!
