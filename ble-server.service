@@ -3,7 +3,7 @@ Description=Start BLE Advertising and GATT Server (ArrestoAICamera)
 After=bluetooth.target
 
 [Service]
-ExecStart=/home/arresto/start_ble_server.sh
+ExecStart=/home/arresto/raspberry_wifi_service/start_ble_server.sh
 Restart=on-failure
 User=arresto
 WorkingDirectory=/home/arresto
