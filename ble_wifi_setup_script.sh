@@ -12,8 +12,7 @@ sudo systemctl restart NetworkManager
 
 echo "[3/6] Creating Python virtual environment..."
 python3 -m venv "$HOME/ble-env"
-. "$HOME/ble-env/bin/activate"
-pip install pydbus
+$HOME/ble-env/bin/pip install pydbus
 
 echo "[4/6] Copying project files to system paths..."
 cp wifi_ble_server_corrected.py "$HOME/wifi_ble_server_corrected.py"
