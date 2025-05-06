@@ -4,7 +4,7 @@ set -e
 
 echo "[1/6] Installing system dependencies..."
 sudo apt update
-sudo apt install -y python3 python3-pip python3-venv python3-dbus python3-gi bluetooth bluez network-manager hcitool
+sudo apt install -y python3 python3-pip python3-venv python3-dbus python3-gi bluetooth bluez network-manager
 
 echo "[2/6] Enabling NetworkManager..."
 sudo systemctl enable NetworkManager
