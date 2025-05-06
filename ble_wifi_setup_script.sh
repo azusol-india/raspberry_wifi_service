@@ -11,16 +11,16 @@ sudo systemctl enable NetworkManager
 sudo systemctl restart NetworkManager
 
 echo "[3/6] Creating Python virtual environment..."
-python3 -m venv /home/arresto/ble-env
-source /home/arresto/ble-env/bin/activate
+python3 -m venv "$HOME/ble-env"
+. "$HOME/ble-env/bin/activate"
 pip install pydbus
 
 echo "[4/6] Copying project files to system paths..."
-cp wifi_ble_server_corrected.py /home/arresto/wifi_ble_server_corrected.py
-cp start_ble_server.sh /home/arresto/start_ble_server.sh
+cp wifi_ble_server_corrected.py "$HOME/wifi_ble_server_corrected.py"
+cp start_ble_server.sh "$HOME/start_ble_server.sh"
 sudo cp ble-server.service /etc/systemd/system/ble-server.service
 
-chmod +x /home/arresto/start_ble_server.sh
+chmod +x "$HOME/start_ble_server.sh"
 
 echo "[5/6] Enabling systemd service..."
 sudo systemctl daemon-reload
