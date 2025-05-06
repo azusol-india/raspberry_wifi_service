@@ -2,4 +2,4 @@
 
 # Step 1: Start BLE Python GATT Server
 echo "[STEP 1] Starting BLE Python GATT Server..."
-sudo python3 $HOME/raspberry_wifi_service/ble_server_corrected.py
+sudo python3 $HOME/raspberry_wifi_service/wifi_ble_server_corrected.py
